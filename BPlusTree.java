@@ -15,7 +15,7 @@ public class BPlusTree {
         BPlusTreeNode currentNode = root;
 
         // Split the root if necessary
-        if (currentNode.getKeys().size() == maxDegree - 1) {
+        if (currentNode.getKeys().size() == maxDegree) {
             BPlusTreeNode newRoot = new BPlusTreeNode(false);
             newRoot.getChildren().add(currentNode);
             splitChild(newRoot, 0, currentNode);
@@ -39,8 +39,8 @@ public class BPlusTree {
             sibling.getChildren().addAll(child.getChildren().subList(midIndex + 1, child.getChildren().size()));
             child.getChildren().subList(midIndex + 1, child.getChildren().size()).clear();
         } else {
-            sibling.getRecords().addAll(child.getRecords().subList(midIndex, child.getRecords().size()));
-            child.getRecords().subList(midIndex, child.getRecords().size()).clear();
+            sibling.getRecords().addAll(child.getRecords().subList(midIndex + 1, child.getRecords().size()));
+            child.getRecords().subList(midIndex + 1, child.getRecords().size()).clear();
         }
     }
 
@@ -57,7 +57,7 @@ public class BPlusTree {
 
             BPlusTreeNode child = node.getChildren().get(pos);
 
-            if (child.getKeys().size() == maxDegree - 1) {
+            if (child.getKeys().size() == maxDegree) {
                 splitChild(node, pos, child);
                 if (key > node.getKeys().get(pos)) {
                     child = node.getChildren().get(pos + 1);
@@ -132,16 +132,20 @@ public class BPlusTree {
 
     // Inner class representing a node in the B+ Tree
     private class BPlusTreeNode {
+        private boolean isLeaf;
         private List<Double> keys;
         private List<BPlusTreeNode> children;
-        private List<GameRecord> records;
-        private boolean isLeaf;
+        private List<GameRecord> records; // Only leaf nodes will use this
 
         public BPlusTreeNode(boolean isLeaf) {
-            this.keys = new ArrayList<>();
-            this.children = new ArrayList<>();
-            this.records = new ArrayList<>();
             this.isLeaf = isLeaf;
+            this.keys = new ArrayList<>();
+            this.children = isLeaf ? null : new ArrayList<>();
+            this.records = isLeaf ? new ArrayList<>() : null;
+        }
+
+        public boolean isLeaf() {
+            return isLeaf;
         }
 
         public List<Double> getKeys() {
@@ -154,10 +158,6 @@ public class BPlusTree {
 
         public List<GameRecord> getRecords() {
             return records;
-        }
-
-        public boolean isLeaf() {
-            return isLeaf;
         }
     }
 }

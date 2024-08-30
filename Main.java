@@ -36,11 +36,19 @@ public class Main {
 
         // Example search
         double searchKey = 0.484;
+        double tolerance = 0.00001;
         List<GameRecord> results = bPlusTree.search(searchKey);
 
         if (!results.isEmpty()) {
+            boolean found = false;
             for (GameRecord record : results) {
-                System.out.println("Found record: " + record);
+                if (Math.abs(record.getFgPctHome() - searchKey) < tolerance) {
+                    System.out.println("Found record: " + record);
+                    found = true;
+                }
+            }
+            if (!found) {
+                System.out.println("No record found with FG_PCT_home = " + searchKey);
             }
         } else {
             System.out.println("No record found with FG_PCT_home = " + searchKey);
